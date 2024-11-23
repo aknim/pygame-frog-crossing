@@ -20,14 +20,15 @@ frog_y = SCREEN_HEIGHT - FROG_HEIGHT
 frog_speed = 10
 
 # Road and vehicle properties
-LANE_HEIGHT = 80
+LANE_HEIGHT = 40
+SAFE_ZONE_HEIGHT = 40
 NUM_LANES = 3
 vehicle_width = 60
 vehicle_height = 40
 vehicle_speed = 5
 
 # Create lanes and vehicles
-lanes = [SCREEN_HEIGHT - (i + 1) * LANE_HEIGHT for i in range(NUM_LANES)]
+lanes = [SCREEN_HEIGHT - (i + 1) * (LANE_HEIGHT + SAFE_ZONE_HEIGHT) for i in range(NUM_LANES)]
 vehicles = [
     {"x": random.randint(0, SCREEN_WIDTH), 
      "y": lanes[i],
@@ -75,15 +76,24 @@ while running:
             and frog_y < vehicle["y"] + vehicle_height
             and frog_y + FROG_HEIGHT > vehicle["y"]
         ):
-            print("Game Over!")
+            print("Game Over! Frog hit an obstacle!")
             running = False
+
+    # Check for win condition
+    if frog_y <= 0:
+        print("You Win!")
+        running = False
     
     # Draw everything
     screen.fill(WHITE) # Clear the screen
 
-    # Draw lanes
-    for lane in lanes:
-        pygame.draw.rect(screen, GRAY, (0, lane, SCREEN_WIDTH, LANE_HEIGHT))
+    # Draw lanes and safe zones
+    for i, lane_y in enumerate(lanes):
+        # Draw road(lane)
+        pygame.draw.rect(screen, GRAY, (0, lane_y, SCREEN_WIDTH, LANE_HEIGHT))
+        # Draw safe zone
+        if i < NUM_LANES - 1:
+            pygame.draw.rect(screen, WHITE, (0, lane_y + LANE_HEIGHT, SCREEN_WIDTH, SAFE_ZONE_HEIGHT))
 
     # Draw vehicles
     for vehicle in vehicles:
